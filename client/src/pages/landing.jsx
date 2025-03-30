@@ -23,7 +23,7 @@ export default function LandingPage() {
           </h1>
           <p>Cover a distance by apna video call.</p>
           <button>
-            <Link to={"/home"}>Get Started</Link>
+            <Link to={"/auth"}>Get Started</Link>
           </button>
         </div>
         <div className="mobile-img">
