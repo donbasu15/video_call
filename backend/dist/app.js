@@ -15,7 +15,7 @@ const server = (0, _nodeHttp.createServer)(app);
 const io = (0, _socketManager.connectToSocket)(server);
 app.set("port", process.env.PORT || 8000);
 app.use((0, _cors.default)({
-  origin: "*",
+  origin: "https://meet2meet.netlify.app",
   // or "*" for all origins (not recommended for production)
   methods: ["GET", "POST", "OPTIONS"],
   credentials: true
