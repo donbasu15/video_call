@@ -1,15 +1,9 @@
-"use strict";
-
-Object.defineProperty(exports, "__esModule", {
-  value: true
-});
-exports.connectToSocket = void 0;
-var _socket = require("socket.io");
+import { Server } from "socket.io";
 let connections = {};
 let messages = {};
 let timeOnline = {};
-const connectToSocket = server => {
-  const io = new _socket.Server(server, {
+export const connectToSocket = server => {
+  const io = new Server(server, {
     cors: {
       origin: "*",
       methods: ["GET", "POST"],
@@ -86,4 +80,3 @@ const connectToSocket = server => {
   });
   return io;
 };
-exports.connectToSocket = connectToSocket;

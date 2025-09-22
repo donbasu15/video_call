@@ -1,37 +1,30 @@
-"use strict";
-
-Object.defineProperty(exports, "__esModule", {
-  value: true
-});
-exports.default = void 0;
-var _express = _interopRequireDefault(require("express"));
-var _nodeHttp = require("node:http");
-var _dotenv = _interopRequireDefault(require("dotenv"));
-var _socket = require("socket.io");
-var _mongoose = _interopRequireDefault(require("mongoose"));
-var _socketManager = require("./controllers/socketManager.js");
-var _cors = _interopRequireDefault(require("cors"));
-var _usersRoutes = _interopRequireDefault(require("./routes/users.routes.js"));
-function _interopRequireDefault(e) { return e && e.__esModule ? e : { default: e }; }
-_dotenv.default.config();
-const app = (0, _express.default)();
-const server = (0, _nodeHttp.createServer)(app);
-const io = (0, _socketManager.connectToSocket)(server);
+import express from "express";
+import { createServer } from "node:http";
+import dotenv from "dotenv";
+dotenv.config();
+import { Server } from "socket.io";
+import mongoose from "mongoose";
+import { connectToSocket } from "./controllers/socketManager.js";
+import cors from "cors";
+import userRoutes from "./routes/users.routes.js";
+const app = express();
+const server = createServer(app);
+const io = connectToSocket(server);
 app.set("port", process.env.PORT || 8000);
-app.use((0, _cors.default)({
+app.use(cors({
   origin: "*",
   // or "*" for all origins (not recommended for production)
   methods: ["GET", "POST", "OPTIONS"],
   credentials: true
 }));
-app.use(_express.default.json({
+app.use(express.json({
   limit: "40kb"
 }));
-app.use(_express.default.urlencoded({
+app.use(express.urlencoded({
   limit: "40kb",
   extended: true
 }));
-app.use("/api/v1/users", _usersRoutes.default);
+app.use("/api/v1/users", userRoutes);
 const mongoUrl = process.env.DB_URL;
 console.log(mongoUrl);
 app.get("/", (req, res) => {
@@ -39,7 +32,7 @@ app.get("/", (req, res) => {
 });
 const start = async () => {
   app.set("mongo_user");
-  const connectionDb = await _mongoose.default.connect(`${mongoUrl}`);
+  const connectionDb = await mongoose.connect(`${mongoUrl}`);
   console.log(`MONGO Connected DB Host: ${connectionDb.connection.host}`);
 
   // For local development
@@ -52,4 +45,4 @@ const start = async () => {
 start();
 
 // Export for Vercel
-var _default = exports.default = app;
+export default app;
