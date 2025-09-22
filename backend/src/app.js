@@ -38,9 +38,16 @@ const start = async () => {
   app.set("mongo_user");
   const connectionDb = await mongoose.connect(`${mongoUrl}`);
   console.log(`MONGO Connected DB Host: ${connectionDb.connection.host}`);
-  server.listen(app.get("port"), () => {
-    console.log("LISTENING ON PORT 8000");
-  });
+
+  // For local development
+  if (process.env.NODE_ENV !== "production") {
+    server.listen(app.get("port"), () => {
+      console.log("LISTENING ON PORT 8000");
+    });
+  }
 };
 
 start();
+
+// Export for Vercel
+export default app;

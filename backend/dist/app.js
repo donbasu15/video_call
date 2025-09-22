@@ -1,5 +1,9 @@
 "use strict";
 
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.default = void 0;
 var _express = _interopRequireDefault(require("express"));
 var _nodeHttp = require("node:http");
 var _dotenv = _interopRequireDefault(require("dotenv"));
@@ -37,8 +41,15 @@ const start = async () => {
   app.set("mongo_user");
   const connectionDb = await _mongoose.default.connect(`${mongoUrl}`);
   console.log(`MONGO Connected DB Host: ${connectionDb.connection.host}`);
-  server.listen(app.get("port"), () => {
-    console.log("LISTENING ON PORT 8000");
-  });
+
+  // For local development
+  if (process.env.NODE_ENV !== "production") {
+    server.listen(app.get("port"), () => {
+      console.log("LISTENING ON PORT 8000");
+    });
+  }
 };
 start();
+
+// Export for Vercel
+var _default = exports.default = app;
