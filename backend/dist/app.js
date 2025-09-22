@@ -14,24 +14,11 @@ const app = (0, _express.default)();
 const server = (0, _nodeHttp.createServer)(app);
 const io = (0, _socketManager.connectToSocket)(server);
 app.set("port", process.env.PORT || 8000);
-
-// Handle preflight requests
-app.options("*", (0, _cors.default)());
 app.use((0, _cors.default)({
-  origin: function (origin, callback) {
-    // Allow requests with no origin (like mobile apps or curl requests)
-    if (!origin) return callback(null, true);
-    const allowedOrigins = ["https://meet2meet.netlify.app", "http://localhost:3000", "http://localhost:3001", "http://127.0.0.1:3000", "http://127.0.0.1:3001"];
-
-    // Check if the origin is in our allowed list or if it's a Netlify deploy preview
-    if (allowedOrigins.includes(origin) || origin.includes("netlify.app")) {
-      return callback(null, true);
-    }
-    return callback(new Error("Not allowed by CORS"));
-  },
-  methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
-  credentials: true,
-  allowedHeaders: ["Content-Type", "Authorization", "X-Requested-With"]
+  origin: "*",
+  // or "*" for all origins (not recommended for production)
+  methods: ["GET", "POST", "OPTIONS"],
+  credentials: true
 }));
 app.use(_express.default.json({
   limit: "40kb"
@@ -43,6 +30,9 @@ app.use(_express.default.urlencoded({
 app.use("/api/v1/users", _usersRoutes.default);
 const mongoUrl = process.env.DB_URL;
 console.log(mongoUrl);
+app.get("/", (req, res) => {
+  res.send("API IS RUNNING");
+});
 const start = async () => {
   app.set("mongo_user");
   const connectionDb = await _mongoose.default.connect(`${mongoUrl}`);
