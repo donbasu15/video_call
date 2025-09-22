@@ -39,12 +39,11 @@ const start = async () => {
   const connectionDb = await mongoose.connect(`${mongoUrl}`);
   console.log(`MONGO Connected DB Host: ${connectionDb.connection.host}`);
 
-  // For local development
-  if (process.env.NODE_ENV !== "production") {
-    server.listen(app.get("port"), () => {
-      console.log("LISTENING ON PORT 8000");
-    });
-  }
+  // Start server on all environments
+  const port = app.get("port");
+  server.listen(port, () => {
+    console.log(`LISTENING ON PORT ${port}`);
+  });
 };
 
 start();
