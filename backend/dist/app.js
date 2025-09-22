@@ -14,7 +14,12 @@ const app = (0, _express.default)();
 const server = (0, _nodeHttp.createServer)(app);
 const io = (0, _socketManager.connectToSocket)(server);
 app.set("port", process.env.PORT || 8000);
-app.use((0, _cors.default)());
+app.use((0, _cors.default)({
+  origin: "*",
+  // or "*" for all origins (not recommended for production)
+  methods: ["GET", "POST", "OPTIONS"],
+  credentials: true
+}));
 app.use(_express.default.json({
   limit: "40kb"
 }));
