@@ -1,4 +1,6 @@
 let IS_PROD = true;
-const server = IS_PROD ? "https://meetb.vercel.app" : "http://localhost:8000";
+const server = IS_PROD
+  ? "https://video-call-wd2t.onrender.com"
+  : "http://localhost:8000";
 
 export default server;
