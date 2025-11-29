@@ -1,7 +1,4 @@
-# Docs for the Azure Web Apps Deploy action: https://github.com/Azure/webapps-deploy
-# More GitHub Actions for Azure: https://github.com/Azure/actions
-
-name: Build and deploy Node.js app to Azure Web App - callvidback
+name: Build and deploy Node.js backend to Azure Web App - callvidback
 
 on:
   push:
@@ -13,41 +10,43 @@ jobs:
   build:
     runs-on: ubuntu-latest
     permissions:
-      contents: read #This is required for actions/checkout
+      contents: read
 
     steps:
       - uses: actions/checkout@v4
 
-      - name: Set up Node.js version
+      - name: Set up Node.js
         uses: actions/setup-node@v3
         with:
           node-version: '20.x'
 
-      - name: npm install, build, and test
+      - name: Install, build and test (backend)
+        working-directory: ./backend
         run: |
-          npm install
+          npm ci
           npm run build --if-present
           npm run test --if-present
 
-      - name: Upload artifact for deployment job
+      - name: Upload backend artifact
         uses: actions/upload-artifact@v4
         with:
-          name: node-app
-          path: .
+          name: backend-artifact
+          path: backend
 
   deploy:
     runs-on: ubuntu-latest
     needs: build
     permissions:
-      id-token: write #This is required for requesting the JWT
-      contents: read #This is required for actions/checkout
+      id-token: write
+      contents: read
 
     steps:
-      - name: Download artifact from build job
+      - name: Download backend artifact
         uses: actions/download-artifact@v4
         with:
-          name: node-app
-      
+          name: backend-artifact
+          path: .
+
       - name: Login to Azure
         uses: azure/login@v2
         with:
@@ -55,11 +54,20 @@ jobs:
           tenant-id: ${{ secrets.AZUREAPPSERVICE_TENANTID_0C3C0301C2E04B9386B22EBDD61A7AA3 }}
           subscription-id: ${{ secrets.AZUREAPPSERVICE_SUBSCRIPTIONID_9689CFB3E9364099BA7944F54ED9E06A }}
 
-      - name: 'Deploy to Azure Web App'
+      - name: Set App Settings (inject MongoDB connection string)
+        uses: azure/CLI@v1
+        with:
+          azcliversion: 2.56.0
+          inlineScript: |
+            az webapp config appsettings set \
+              --name "callvidback" \
+              --resource-group "${{ secrets.AZURE_RESOURCE_GROUP }}" \
+              --settings MONGO_URI="${{ secrets.DB_URL }}" NODE_ENV="production"
+
+      - name: Deploy backend to Azure Web App
         id: deploy-to-webapp
         uses: azure/webapps-deploy@v3
         with:
           app-name: 'callvidback'
           slot-name: 'Production'
-          package: .
-          
+          package: './backend'
