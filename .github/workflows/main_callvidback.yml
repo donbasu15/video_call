@@ -20,7 +20,7 @@ jobs:
         with:
           node-version: '20.x'
 
-      - name: npm install, build and test (backend)
+      - name: Install, build and test (backend)
         working-directory: ./backend
         run: |
           npm ci
@@ -54,21 +54,9 @@ jobs:
           tenant-id: ${{ secrets.AZUREAPPSERVICE_TENANTID_0C3C0301C2E04B9386B22EBDD61A7AA3 }}
           subscription-id: ${{ secrets.AZUREAPPSERVICE_SUBSCRIPTIONID_9689CFB3E9364099BA7944F54ED9E06A }}
 
-      - name: Set App Settings (inject MongoDB connection string)
-        uses: azure/CLI@v1
-        with:
-          azcliversion: 2.56.0
-          inlineScript: |
-            az webapp config appsettings set \
-              --name "callvidback" \
-              --resource-group "${{ secrets.AZURE_RESOURCE_GROUP }}" \
-              --settings MONGO_URI="${{ secrets.DB_URL }}" NODE_ENV="production"
-
       - name: Deploy backend to Azure Web App
-        id: deploy-to-webapp
         uses: azure/webapps-deploy@v3
         with:
           app-name: 'callvidback'
           slot-name: 'Production'
           package: './backend'
-
